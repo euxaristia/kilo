@@ -1,26 +1,30 @@
-Kilo
-===
+# Kilo (Rust)
 
-Kilo is a small text editor in less than 1K lines of code (counted with cloc).
+A very simple text editor in less than 1,000 lines of Rust code.
 
-A screencast is available here: https://asciinema.org/a/90r2i9bq8po03nazhqtsifksb
+This is a rewrite of the original Kilo editor (by antirez) and its Go port. This version leverages Rust's safety guarantees to prevent common issues found in other ports.
 
-Usage: kilo `<filename>`
+## Key Improvements
+- **No Data Races:** Window resize handling uses thread-safe atomics (`AtomicBool` and `OnceLock`).
+- **No Stack Overflows:** Syntax highlighting is iterative, not recursive, ensuring it can handle very large files.
+- **Bounds-Safe:** Every slice operation is checked using `>=` and `<=` to prevent "index out of range" panics.
+- **Automatic Terminal Restoration:** Uses the RAII pattern (`RawMode` guard) to ensure the terminal is restored even during a panic or crash.
+- **Fixed Search:** Correctly maps rendered tab expansion back to the original character index.
 
-Keys:
+## Building
+You need the Rust toolchain installed.
 
-    CTRL-S: Save
-    CTRL-Q: Quit
-    CTRL-F: Find string in file (ESC to exit search, arrows to navigate)
+```bash
+cargo build --release
+```
 
-Kilo does not depend on any library (not even curses). It uses fairly standard
-VT100 (and similar terminals) escape sequences. The project is in alpha
-stage and was written in just a few hours taking code from my other two
-projects, load81 and linenoise.
+## Usage
+```bash
+./target/release/kilo <filename>
+```
 
-People are encouraged to use it as a starting point to write other editors
-or command line interfaces that are more advanced than the usual REPL
-style CLI.
-
-Kilo was written by Salvatore Sanfilippo aka antirez and is released
-under the BSD 2 clause license.
+## Controls
+- **Arrows:** Move cursor
+- **Ctrl-S:** Save
+- **Ctrl-F:** Find
+- **Ctrl-Q:** Quit
